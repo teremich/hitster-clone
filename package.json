@@ -1,0 +1,20 @@
+{
+  "name": "spotify-web-api-playthingy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx tsc && node out/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ich",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "spotify-web-api-node": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
+  }
+}
