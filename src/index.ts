@@ -43,7 +43,7 @@ const spotifyApi: SpotifyWebApi =
 new SpotifyApi({
     clientId: client_id,
     clientSecret: client_secret,
-    redirectUri: `http://hitster.localhost:${port}/callback`
+    redirectUri: `https://fictional-sniffle-4vr47w995g5fqp7p-3000.app.github.dev/callback`
 });
 
 interface playlist_t {
@@ -213,15 +213,15 @@ app.get("/next", debugMiddleware, async (req: Request, res) => {
         playlists[randomIndex].uri.split(":")[2]
     );
     randomIndex = Math.floor(Math.random()*tracks.length);
-    playFromRandom(tracks[randomIndex]);
+    await playFromRandom(tracks[randomIndex]);
     ejs.renderFile("public/play/index.ejs", {year: tracks[randomIndex].year ?? ""}, {}, (error, string) => {
         if (error) { console.log("[ERROR:callback:renderFile]", error); }
         res.send(string);
+        timer = setTimeout(() => {
+            stopPlayback();
+            timer = null;
+        }, 10_000);
     });
-    timer = setTimeout(() => {
-        stopPlayback();
-        timer = null;
-    }, 5000);
 });
 
 app.listen(port, () => {
