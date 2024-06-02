@@ -20,13 +20,17 @@
             }
         </style>
     </head>
-    <body>
+    <body style="text-align: center; padding: 10%">
         <header style="line-height: 80px; position: fixed;">
             <h1 style="line-height: 80px">✨HITSTER!✨</h1>
         </header>
         <main style="padding-top: 80px">
             <p style="font-weight: 400; font-size: 40pt;">
-                <a class="link" href="/next">NEXT</a>&nbsp;&Tab;&nbsp;<a><%= year %></a>
+                <a class="link" href="/next">NEXT</a>&nbsp;&Tab;&nbsp;
+                <details style="display: inline; font-size: 40pt">
+                    <summary>Veröffentlicht am</summary>
+                    <a><%= year %></a>
+                </details>
             </p>
         </main>
         <footer>

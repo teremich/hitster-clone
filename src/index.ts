@@ -4,14 +4,11 @@ import express from "express";
 import type { Response, UsersSavedTracksResponse, PlaylistTrackResponse, SpotifyWebApi } from "spotify-web-api-node"
 import SpotifyApi from "spotify-web-api-node";
 import * as ejs from "ejs";
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { config } from "dotenv";
-config();
+config({path: "hitster-clone/.env"});
 
-const app = express();
-const port = process.env.SPOTIFY_PORT ?? "3050";
-const key = randomBytes(32);
-const iv = randomBytes(16);
+const app = express.Router();
 
 const client_id: string = process.env.SPOTIFY_CLIENT_ID!;
 const client_secret: string = process.env.SPOTIFY_CLIENT_SECRET!;
@@ -43,7 +40,7 @@ const spotifyApi: SpotifyWebApi =
 new SpotifyApi({
     clientId: client_id,
     clientSecret: client_secret,
-    redirectUri: `https://fictional-sniffle-4vr47w995g5fqp7p-3000.app.github.dev/callback`
+    redirectUri: `https://hitster.teremich.de/callback`
 });
 
 interface playlist_t {
@@ -105,7 +102,7 @@ async function getAllTracks(playlist: string): Promise<track_t[]> {
                 year: item.track!.album?.release_date?.slice(0, 7)
             });
         }
-    } while (tracks.length < res.body.total);
+    } while (tracks.length < res.body.total && tracks.length < 100);
     console.log(`[INFO] there were ${tracks.length} tracks in the response`);
     return tracks;
 }
@@ -169,7 +166,7 @@ app.get('/callback', debugMiddleware, async (req: Request, res: Res) => {
             console.error('Error getting Tokens:', error);
             res.send(`Error getting Tokens: ${error}`);
         });
-    ejs.renderFile("public/play/index.ejs", {year: ""}, {}, (error, string) => {
+    ejs.renderFile("hitster-clone/public/play/index.ejs", {year: ""}, {}, (error, string) => {
         if (error) { console.log("[ERROR:callback:renderFile]", error); }
         res.send(string);
     });
@@ -205,7 +202,9 @@ app.get("/next", debugMiddleware, async (req: Request, res) => {
     }
     let playlists: playlist_t[] = [
         {
-            ft: false, name: "Playlist", id: "4VxdlVzE0TLYqNMfwY8VkC", uri: "spotify:playlist:4VxdlVzE0TLYqNMfwY8VkC"
+            // ft: true, name: "meine Lieblingslieder", id:"", uri: "::ft",
+            // ft: false, name: "Playlist", id: "4VxdlVzE0TLYqNMfwY8VkC", uri: "spotify:playlist:4VxdlVzE0TLYqNMfwY8VkC"
+            ft: false, name: "Bounce FM", id: "3vDHMfydqNYsg7L3KWRlDe", uri: "spotify:playlist:3vDHMfydqNYsg7L3KWRlDe"
         }
     ];
     let randomIndex = Math.floor(Math.random()*playlists.length);
@@ -214,7 +213,7 @@ app.get("/next", debugMiddleware, async (req: Request, res) => {
     );
     randomIndex = Math.floor(Math.random()*tracks.length);
     await playFromRandom(tracks[randomIndex]);
-    ejs.renderFile("public/play/index.ejs", {year: tracks[randomIndex].year ?? ""}, {}, (error, string) => {
+    ejs.renderFile("hitster-clone/public/play/index.ejs", {year: tracks[randomIndex].year ?? ""}, {}, (error, string) => {
         if (error) { console.log("[ERROR:callback:renderFile]", error); }
         res.send(string);
         timer = setTimeout(() => {
@@ -224,9 +223,8 @@ app.get("/next", debugMiddleware, async (req: Request, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`listening on ${port}\nhttp://hitster.localhost:${port}/login`);
-});
-
-app.use(express.static("public"));
+app.use("/index.html", express.static("hitster-clone/public"));
+app.use("/", express.static("hitster-clone/public"));
 app.use(express.json({ limit: "1mb" }));
+
+export default app;
